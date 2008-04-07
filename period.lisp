@@ -201,7 +201,8 @@
 ;;; Next, period strings based on cfengine's time classes.
 ;;;
 (defun tokenize-period (string)
-  (let ((token (make-array 0 :adjustable t :fill-pointer 0))
+  (let ((token (make-array 15 :adjustable t :fill-pointer 0
+                              :element-type 'standard-char))
         (tokenized ()))
     (labels ((op->tok (op)
                (case op
@@ -212,18 +213,17 @@
                  (#\) :cparen)))
              (push-current-token-with-op (op)
                (unless (= 0 (length token))
-                 (push (coerce token 'string) tokenized)
-                 (setf token (make-array 0 :adjustable t :fill-pointer 0)))
+                 (push (copy-seq token) tokenized)
+                 (setf (fill-pointer token) 0))
                (when op
                  (push (op->tok op) tokenized))))
       (loop for c across (string-upcase string)
-         if (member c '(#\. #\| #\( #\) #\! #\~) :test #'char=)
-           do (push-current-token-with-op c)
-         else
-           do (vector-push-extend c token)
-         finally
-           (push-current-token-with-op nil))
+            do (if (member c '(#\. #\| #\( #\) #\! #\~) :test #'char=)
+                   (push-current-token-with-op c)
+                   (vector-push-extend c token))
+            finally (push-current-token-with-op nil))
       (nreverse tokenized))))
+
 
 (defun string->keyword (s)
   (intern (string-upcase s) "KEYWORD"))
