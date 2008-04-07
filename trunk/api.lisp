@@ -30,9 +30,9 @@
   (yacc:parse-with-lexer
    (token-list-lexer (tokenize-period s))
    *period-class-parser*))
-  
-(defgeneric in-period-p (period &optional time)
-  (:documentation ""))
+
+
+(defgeneric in-period-p (period &optional time))
 
 (defmethod in-period-p ((period list) &optional (time (get-universal-time)))
   (eval-period period time))
@@ -41,8 +41,7 @@
   (eval-period (compile-period-string period) time))
 
 
-(defgeneric define-period-class (name period)
-  (:documentation "add a period class"))
+(defgeneric define-period-class (name period))
 
 (defmethod define-period-class ((name string) (period string))
   (add-period-class (string->keyword name) (compile-period-string period)))
