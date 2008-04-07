@@ -91,7 +91,8 @@ There are no restarts.
 
 _function_
 *`compile-period-string`* _`period-string` => period-list_
- Converts a string period into the lispy period format.  May signal any of the conditions and warning listed above.
+ Converts a string period into the lispy period format.  May signal any of the conditions and the warning
+ listed above.
 
 _generic function_
 *`in-period-p`* _`period &optional (time (get-universal-time))` => boolean_
