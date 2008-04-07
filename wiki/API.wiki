@@ -2,7 +2,7 @@
 
 = Introduction =
 
-This library can handle two quite different notations for time periods, one lispy and one based on the syntax used by [http://www.cfengine.org/ cfengine]'s class notation.  It was written to be used in long-running lisp processes doing various kinds of system (computer) and environmental monitoring, so I could say "don't page me at 3am about this" or "don't worry about this on weekends."  A Python version of this library was useful, so I've made this CL version public, too.
+This library can handle two quite different notations for time periods, one lispy and one modeled on the syntax used by [http://www.cfengine.org/ cfengine]'s class notation.  It was written to be used in long-running lisp processes doing various kinds of system (computer) and environmental monitoring, so I could say "don't page me at 3am about this" or "don't worry about this on weekends."  A Python version of this library was useful, so I've made this CL version public, too.
 
 The library depends on the behavior of your lisp's implementation of *`DECODE-UNIVERSAL-TIME`*.  It cannot currently be told to calculate a period in a different time zone.
 
@@ -97,7 +97,7 @@ _generic function_
 *`in-period-p`* _`period &optional (time (get-universal-time))` => boolean_
   Takes either a string or list period and returns *`t`* or *`nil`* if the given period matches the time.  A string
   will have to be compiled before being tested, so frequently run period checks should probably precompile all
-  periods.
+  periods.  Some future version may memoize these string periods.
 
 _generic function_
 *`define-period-class`* _`name period` => period-list_
