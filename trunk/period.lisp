@@ -388,6 +388,10 @@ multiple values, a boolean and one of HR, YR, SEC, MIN, DAY."
                          (t (syntax-error "ghastly error in token stream - ~S - please report this as a bug" value)))))
               (values term value))))))
 
+;;; If any of the functions referred to below (#'or-expr, etc) is changed
+;;; during a development session this form has to be evaluated, too.  It
+;;; keeps hold of the old definitions since it's not keeping their names
+;;; but their function values.
 (yacc:define-parser *period-class-parser*
   (:start-symbol expr)
   (:terminals (:and :or :tok :not :period :oparen :cparen))
