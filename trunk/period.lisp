@@ -218,12 +218,13 @@
                (when op
                  (push (op->tok op) tokenized))))
       (loop for c across (string-upcase string)
-            do (if (member c '(#\. #\| #\( #\) #\! #\~) :test #'char=)
-                   (push-current-token-with-op c)
-                   (vector-push-extend c token))
+            do (cond ((member c '(#\. #\| #\( #\) #\! #\~) :test #'char=)
+                      (push-current-token-with-op c))
+                     ;; ignore whitespace
+                     ((member c '(#\Space #\Tab #\Newline) :test #'char=) nil)
+                     (t (vector-push-extend c token)))
             finally (push-current-token-with-op nil))
       (nreverse tokenized))))
-
 
 (defun string->keyword (s)
   (intern (string-upcase s) "KEYWORD"))
