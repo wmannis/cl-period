@@ -1,10 +1,8 @@
-#summary how to use the library
-
 = Introduction =
 
 This library can handle two quite different notations for time periods, one lispy and one modeled on the syntax used by [http://www.cfengine.org/ cfengine]'s class notation.  It was written to be used in long-running lisp processes doing various kinds of system (computer) and environmental monitoring, so I could say "don't page me at 3am about this" or "don't worry about this on weekends."  A Python version of this library was useful, so I've made this CL version public, too.
 
-The library depends on the behavior of your lisp's implementation of *`DECODE-UNIVERSAL-TIME`*.  It cannot currently be told to calculate a period in a different time zone.
+The library depends on the behavior of your lisp's implementation of *`DECODE-UNIVERSAL-TIME`*.  It cannot currently be told to compare a period against different time zones.
 
 = Time Periods =
 
