@@ -72,7 +72,7 @@
 (defmacro with-decoded-time (time &body body)
  `(multiple-value-bind
    (second minute hour date month year day-of-week daylight-p zone)
-   (decode-universal-time ,time)
+     (decode-universal-time ,time)
    (declare (ignorable second minute hour date month year day-of-week daylight-p zone))
      ,@body))
 
@@ -83,7 +83,7 @@
 (defmacro make-sanity-checker (op &body range-test)
  `(defmethod sanity-check-args ((op (eql ,op)) args)
     (unless (= (length args) 1)
-      (arity-error "~A takes one argument: ~{~A~^, ~}" op args))
+      (arity-error "~A takes one argument: ~A" op args))
     (unless (apply #',@range-test args)
       (range-error "~A not meaningful in ~A clause" args op))))
 
@@ -91,7 +91,7 @@
 (make-sanity-checker :minute (lambda (n) (<= 0 n 59)))
 (make-sanity-checker :hour (lambda (n) (<= 0 n 23)))
 (make-sanity-checker :date (lambda (n) (<= 1 n 32)))
-(make-sanity-checker :year (lambda (n) (declare (ignore n)) t))
+(make-sanity-checker :year (lambda (n) (<= 1 n)))
 (make-sanity-checker :month (lambda (n) (getf +months+ n)))
 (make-sanity-checker :day-of-week (lambda (n) (getf +days-of-week+ n)))
 (make-sanity-checker 'not (lambda (n) (declare (ignore n)) t))
