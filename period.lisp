@@ -1,6 +1,5 @@
 ;;; -*- mode: lisp; syntax: common-lisp; package: cl-period; encoding: utf-8 -*-
-;;; Author: William S. Annis
-;;; Version: $Revision: 1.5 $
+;;; $Id$
 ;;;
 ;;; Copyright (c) 2008 William S. Annis.  All rights reserved.
 ;;;
@@ -35,7 +34,8 @@
  '(:january 1 :february 2 :march 3 :april 4 :may 5 :june 6 :july 7
    :august 8 :september 9 :october 10 :november 11 :december 12))
 
-(defvar *period-classes* (make-hash-table))
+(defvar *period-classes* (make-hash-table)
+  "holds user-defined period classes")
 
 
 (define-condition contract-violation (error)
@@ -74,7 +74,7 @@
    (second minute hour date month year day-of-week daylight-p zone)
    (decode-universal-time ,time)
    (declare (ignorable second minute hour date month year day-of-week daylight-p zone))
-   ,@body))
+     ,@body))
 
 (defgeneric sanity-check-args (op args)
  (:documentation
@@ -95,13 +95,6 @@
 (make-sanity-checker :month (lambda (n) (getf +months+ n)))
 (make-sanity-checker :day-of-week (lambda (n) (getf +days-of-week+ n)))
 (make-sanity-checker 'not (lambda (n) (declare (ignore n)) t))
-
-;;; defined ranges for multiple use
-;;; (define-period-class* :weekday
-;;;   '(and (not (:day-of-week :saturday))
-;;;         (not (:day-of-week :sunday))))
-;;; (define-period-class :weekday "!Saturday.!Sunday")
-;;; generify on string vs. list?
 (make-sanity-checker :class (lambda (n) (gethash n *period-classes*)))
 
 (defun get-unary-arg (op applicand)
@@ -360,20 +353,28 @@ multiple values, a boolean and one of HR, YR, SEC, MIN, DAY."
       (if (find #\- e)
           ;; ranges
           (parse-range-expr e)
-          ;; simple tokens
-          (cond ((getf +days-of-week+ k) (list :day-of-week k))
-                ((getf +months+ k) (list :month k))
-                ((string= e "HR" :end1 2)
-                 (list :hour (parse-integer e :start 2)))
-                ((string= e "YR" :end1 2)
-                 (list :year (parse-integer e :start 2)))
-                ((string= e "MIN" :end1 3)
-                 (list :minute (parse-integer e :start 3)))
-                ((string= e "SEC" :end1 3)
-                 (list :second (parse-integer e :start 3)))
-                ((string= e "DAY" :end1 3)
-                 (list :date (parse-integer e :start 3)))
-                (t (list :class k))))))
+          ;; simple single periods, checked for sanity
+          (labels ((check-and-return (op n)
+                     (sanity-check-args op (list n))
+                     n))
+            (cond ((getf +days-of-week+ k) (list :day-of-week k))
+                  ((getf +months+ k) (list :month k))
+                  ((string= e "HR" :end1 2)
+                   (list :hour (check-and-return
+                                :hour (parse-integer e :start 2))))
+                  ((string= e "YR" :end1 2)
+                   (list :year (check-and-return
+                                :year (parse-integer e :start 2))))
+                  ((string= e "MIN" :end1 3)
+                   (list :minute (check-and-return
+                                  :minute (parse-integer e :start 3))))
+                  ((string= e "SEC" :end1 3)
+                   (list :second (check-and-return
+                                  :second (parse-integer e :start 3))))
+                  ((string= e "DAY" :end1 3)
+                   (list :date (check-and-return
+                                :date (parse-integer e :start 3))))
+                  (t (list :class k)))))))
 )
 
 (defun token-list-lexer (list)

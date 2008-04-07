@@ -27,6 +27,16 @@
     (compile-period-string "Hr33")))
 
 (addtest (period-tests)
+  range-condition-4
+  (ensure-condition range-violation
+    (compile-period-string "Sec93")))
+
+(addtest (period-tests)
+  range-condition-5
+  (ensure-condition range-violation
+    (compile-period-string "Day43")))
+
+(addtest (period-tests)
   arity-condition-1
   (ensure-condition arity-violation
     (in-period-p '(:minute-range 5))))
