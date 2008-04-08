@@ -20,7 +20,7 @@ The keyword-heavy list notation for time periods is:
  * *`(AND expr1 ... exprn)`* will short-circuit once false is found
  * *`(OR expr1 ... exprn)`* will short-circuit once true is found
 
-All of these period notations have a range version *`(:year-range y1 y2)`*.   All of the ranges understand that time cycles, so that *`(:hour-range 22 8)`* does the correct thing.  You _may_ indicate a year range with the first value larger than the second, but a *`GIBBERISH-CYCLING-YEAR-RANGE`* warning will be signaled about it.  *`(:year-range 2008 2005)`* is effectively *`(not (:year-range 2006 2007))`*.  All ranges are inclusive, which may do surprising things for hours (see string notation for ranges).
+All of these period notations except *`:class`* have a range version *`(:year-range y1 y2)`*.   All of the ranges understand that time cycles, so that *`(:hour-range 22 8)`* does the correct thing.  You _may_ indicate a year range with the first value larger than the second, but a *`GIBBERISH-CYCLING-YEAR-RANGE`* warning will be signaled about it.  *`(:year-range 2008 2005)`* is effectively *`(not (:year-range 2006 2007))`*.  All ranges are inclusive, which may do surprising things for hours (see string notation for ranges).
 
 The case-insensitive string period notation is:
 
