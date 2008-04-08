@@ -4,22 +4,24 @@ If you're going to be checking periods very often you really shouldn't use the s
 PERIOD> (setf bob (compile-period-string "Monday-Friday.Hr9->17"))
 (AND (:DAY-OF-WEEK-RANGE :MONDAY :FRIDAY) (:HOUR-RANGE 9 16))
 PERIOD> (time (dotimes (i 5000)
+                (declare (fixnum i))
                 (in-period-p bob)))
 Evaluation took:
-  0.343 seconds of real time
-  0.317011 seconds of user run time
-  0.019718 seconds of system run time
+  0.192 seconds of real time
+  0.170147 seconds of user run time
+  0.007827 seconds of system run time
   0 page faults and
-  1,572,040 bytes consed.
+  760,072 bytes consed.
 NIL
 PERIOD> (time (dotimes (i 5000)
+                (declare (fixnum i))
                 (in-period-p "Monday-Friday.Hr9->17")))
 Evaluation took:
-  3.598 seconds of real time
-  3.200604 seconds of user run time
-  0.228061 seconds of system run time
+  3.554 seconds of real time
+  3.202775 seconds of user run time
+  0.225485 seconds of system run time
   0 page faults and
-  11,960,272 bytes consed.
+  11,960,256 bytes consed.
 NIL
 PERIOD> 
 }}}
