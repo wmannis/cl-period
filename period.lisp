@@ -375,7 +375,7 @@ multiple values, a boolean and one of HR, YR, SEC, MIN, DAY."
                    (check-and-return :second (parse-integer e :start 3)))
                   ((string= e "DAY" :end1 3)
                    (check-and-return :date (parse-integer e :start 3)))
-                  (t (list :class k))))))) )
+                  (t (check-and-return :class k))))))) )
 
 (defun token-list-lexer (list)
   #'(lambda ()
