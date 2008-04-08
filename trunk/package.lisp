@@ -28,8 +28,9 @@
   (:nicknames :period)
   (:use :common-lisp :yacc)
   (:export :contract-violation
-           :arity-violation
-           :range-violation
+           :period-arity-violation
+           :period-range-violation
+           :period-syntax-violation
            :gibberish-cycling-year-range
            :*period-classes*
            :compile-period-string
