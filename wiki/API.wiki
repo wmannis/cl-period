@@ -96,7 +96,7 @@ _generic function_
 *`in-period-p`* _`period &optional (time (get-universal-time))` => boolean_
   Takes either a string or list period and returns *`t`* or *`nil`* if the given period matches the time.  A string
   will have to be compiled before being tested, so frequently run period checks should probably precompile all
-  periods.  Some future version may memoize these string periods.
+  periods.  Some future version may memoize these string periods. See [Speed]
 
 _generic function_
 *`define-period-class`* _`name period` => period-list_
