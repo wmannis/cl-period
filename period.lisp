@@ -43,23 +43,26 @@
   (:report (lambda (condition stream)
              (format stream (contract-violation-message condition)))))
 
-(define-condition arity-violation (contract-violation)
+(define-condition period-arity-violation (contract-violation)
   ())
 
-(define-condition range-violation (contract-violation)
+(define-condition period-range-violation (contract-violation)
   ())
 
-(define-condition syntax-violation (contract-violation)
+(define-condition period-syntax-violation (contract-violation)
   ())
 
 (defun arity-error (&rest format-args)
-  (error 'arity-violation :message (apply #'format (cons nil format-args))))
+  (error 'period-arity-violation
+         :message (apply #'format (cons nil format-args))))
 
 (defun range-error (&rest format-args)
-  (error 'range-violation :message (apply #'format (cons nil format-args))))
+  (error 'period-range-violation
+         :message (apply #'format (cons nil format-args))))
 
 (defun syntax-error (&rest format-args)
-  (error 'syntax-violation :message (apply #'format (cons nil format-args))))
+  (error 'period-syntax-violation
+         :message (apply #'format (cons nil format-args))))
 
 (define-condition gibberish-cycling-year-range (warning)
   ((range :initarg :range :accessor gibberish-range))
@@ -80,22 +83,21 @@
  (:documentation
   "ensure correct number and type of arguments for a time specifier"))
 
-(defmacro make-sanity-checker (op &body range-test)
- `(defmethod sanity-check-args ((op (eql ,op)) args)
-    (unless (= (length args) 1)
-      (arity-error "~A takes one argument: ~A" op args))
-    (unless (apply #',@range-test args)
-      (range-error "~A not meaningful in ~A clause" args op))))
-
-(make-sanity-checker :second (lambda (n) (<= 0 n 59)))
-(make-sanity-checker :minute (lambda (n) (<= 0 n 59)))
-(make-sanity-checker :hour (lambda (n) (<= 0 n 23)))
-(make-sanity-checker :date (lambda (n) (<= 1 n 32)))
-(make-sanity-checker :year (lambda (n) (<= 1 n)))
-(make-sanity-checker :month (lambda (n) (getf +months+ n)))
-(make-sanity-checker :day-of-week (lambda (n) (getf +days-of-week+ n)))
-(make-sanity-checker 'not (lambda (n) (declare (ignore n)) t))
-(make-sanity-checker :class (lambda (n) (gethash n *period-classes*)))
+(macrolet ((make-sanity-checker (op &body range-test)
+             `(defmethod sanity-check-args ((op (eql ,op)) args)
+                (unless (= (length args) 1)
+                  (arity-error "~A takes one argument: ~A" op args))
+                (unless (apply #',@range-test args)
+                  (range-error "~A not meaningful in ~A clause" args op)))))
+  (make-sanity-checker :second (lambda (n) (<= 0 n 59)))
+  (make-sanity-checker :minute (lambda (n) (<= 0 n 59)))
+  (make-sanity-checker :hour (lambda (n) (<= 0 n 23)))
+  (make-sanity-checker :date (lambda (n) (<= 1 n 32)))
+  (make-sanity-checker :year (lambda (n) (<= 1 n)))
+  (make-sanity-checker :month (lambda (n) (getf +months+ n)))
+  (make-sanity-checker :day-of-week (lambda (n) (getf +days-of-week+ n)))
+  (make-sanity-checker 'not (lambda (n) (declare (ignore n)) t))
+  (make-sanity-checker :class (lambda (n) (gethash n *period-classes*))))
 
 (defun get-unary-arg (op applicand)
  "ensure the sanity of a unary op argument and extract the value"
@@ -303,7 +305,9 @@ multiple values, a boolean and one of HR, YR, SEC, MIN, DAY."
 (defun parse-range-expr (expr)
   (multiple-value-bind (numeric-range-p range-string) (numeric-period-p expr)
     (let* ((dash-idx (search "-" expr))
-           (exclusive-range-p (char= #\> (char expr (1+ dash-idx))))
+           (exclusive-range-p
+            (handler-case (char= #\> (char expr (1+ dash-idx)))
+              (error () (syntax-error "malformed range: ~A" expr))))
            (start1 (if numeric-range-p
                        (length range-string)
                        0))
@@ -316,7 +320,8 @@ multiple values, a boolean and one of HR, YR, SEC, MIN, DAY."
                   (subseq expr start1 end1)
                   (subseq expr start2)))
                (get-range-numbers ()
-                 (mapcar #'parse-integer (get-range)))
+                 (handler-case (mapcar #'parse-integer (get-range))
+                   (parse-error () (syntax-error "cannot parse range: ~A" expr))))
                (rangeify-name (kw)
                  (string->keyword
                   (concatenate 'string (symbol-name kw) "-RANGE")))
@@ -357,26 +362,20 @@ multiple values, a boolean and one of HR, YR, SEC, MIN, DAY."
           ;; simple single periods, checked for sanity
           (labels ((check-and-return (op n)
                      (sanity-check-args op (list n))
-                     n))
+                     (list op n)))
             (cond ((getf +days-of-week+ k) (list :day-of-week k))
                   ((getf +months+ k) (list :month k))
                   ((string= e "HR" :end1 2)
-                   (list :hour (check-and-return
-                                :hour (parse-integer e :start 2))))
+                   (check-and-return :hour (parse-integer e :start 2)))
                   ((string= e "YR" :end1 2)
-                   (list :year (check-and-return
-                                :year (parse-integer e :start 2))))
+                   (check-and-return :year (parse-integer e :start 2)))
                   ((string= e "MIN" :end1 3)
-                   (list :minute (check-and-return
-                                  :minute (parse-integer e :start 3))))
+                   (check-and-return  :minute (parse-integer e :start 3)))
                   ((string= e "SEC" :end1 3)
-                   (list :second (check-and-return
-                                  :second (parse-integer e :start 3))))
+                   (check-and-return :second (parse-integer e :start 3)))
                   ((string= e "DAY" :end1 3)
-                   (list :date (check-and-return
-                                :date (parse-integer e :start 3))))
-                  (t (list :class k)))))))
-)
+                   (check-and-return :date (parse-integer e :start 3)))
+                  (t (list :class k))))))) )
 
 (defun token-list-lexer (list)
   #'(lambda ()
