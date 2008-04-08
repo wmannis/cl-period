@@ -9,7 +9,11 @@
 (use-package :lift)
 
 
-(deftestsuite period-tests () ())
+(deftestsuite period-tests () ()
+  (:setup (defvar *test-time*
+            (encode-universal-time 32 54 17 7 4 2007)))
+  (:teardown (makunbound '*test-time*)))
+
 
 (addtest (period-tests)
   range-condition-1
@@ -130,5 +134,41 @@
   (ensure-same '(:day-of-week :tuesday)
                (compile-period-string "Tuesday")
                :test #'equal))
+
+(addtest (period-tests)
+  period-1
+  (ensure (in-period-p "Sec32.Min54.Hr17.Day7.April.Yr2007"  *time-test*)))
+
+(addtest (period-tests)
+  period-2
+  (ensure (in-period-p "Min50-20"  *time-test*)))
+
+(addtest (period-tests)
+  period-3
+  (ensure (in-period-p "December-May" *time-test*)))
+
+(addtest (period-tests)
+  period-4
+  (ensure (in-period-p "Saturday" *time-test*)))
+
+(addtest (period-tests)
+  period-5
+  (ensure-null (in-period-p "!Saturday" *time-test*)))
+
+(addtest (period-tests)
+  period-6
+  (ensure-null (in-period-p "January->April" *time-test*)))
+
+(addtest (period-tests)
+  period-7
+  (ensure-null (in-period-p "Year2008" *time-test*)))
+
+(addtest (period-tests)
+  period-8
+  (ensure-null (in-period-p "Sec0-30" *time-test*)))
+
+(addtest (period-tests)
+  period-9
+  (ensure (in-period-p "Sec15-45.Min30->0" *time-test*)))
 
 ;;; test-period.lisp ends here
