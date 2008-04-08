@@ -67,15 +67,15 @@ _condition_
   This base error condition isn't directly signalled, but is the parent of the three error conditions below.
 
 _condition_
-*`arity-violation`*
+*`period-arity-violation`*
   A time period or range was called with too many, or too few, arguments.
 
 _condition_
-*`range-violation`*
+*`period-range-violation`*
   A time period or range was called with values that made no sense for the given period (say, Hour 74).
 
 _condition_
-*`syntax-violation`*
+*`period-syntax-violation`*
  The string parser wasn't able to decipher a period string.
 
 _warning condition_
