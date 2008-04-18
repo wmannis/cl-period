@@ -10,7 +10,7 @@
 
 
 (deftestsuite period-tests () ()
-  (:setup (defvar *test-time*
+  (:setup (defvar *time-test*
             (encode-universal-time 32 54 17 7 4 2007)))
   (:teardown (makunbound '*test-time*)))
 
@@ -161,7 +161,7 @@
 
 (addtest (period-tests)
   period-7
-  (ensure-null (in-period-p "Year2008" *time-test*)))
+  (ensure-null (in-period-p "Yr2008" *time-test*)))
 
 (addtest (period-tests)
   period-8
@@ -170,5 +170,7 @@
 (addtest (period-tests)
   period-9
   (ensure (in-period-p "Sec15-45.Min30->0" *time-test*)))
+
+;;; Need to test added classes.
 
 ;;; test-period.lisp ends here
