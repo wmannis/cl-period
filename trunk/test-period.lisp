@@ -171,6 +171,22 @@
   period-9
   (ensure (in-period-p "Sec15-45.Min30->0" *time-test*)))
 
-;;; Need to test added classes.
+(addtest (period-tests)
+  user-defined-class-1
+  (ensure-null (let ((*period-classes* (make-hash-table)))
+                 (define-period-class :weekday "Monday-Friday")
+                 (in-period-p "Weekday" *time-test*))))
+
+(addtest (period-tests)
+  user-defined-class-2
+  (ensure (let ((*period-classes* (make-hash-table)))
+            (define-period-class :weekend "Saturday|Sunday")
+            (in-period-p "Weekend" *time-test*))))
+
+(addtest (period-tests)
+  user-defined-class-error
+  (ensure-condition period-range-violation
+    (let ((*period-classes* (make-hash-table)))
+      (in-period-p "Weekend" *time-test*))))
 
 ;;; test-period.lisp ends here
