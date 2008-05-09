@@ -25,7 +25,7 @@ All of these period notations except *`:class`* have a range version *`(:year-ra
 The case-insensitive string period notation is:
 
  * Sec00 - Sec59
- * Min00 - Min 59
+ * Min00 - Min59
  * Hr00 - Hr23
  * Day1 - Day32  (note here it is called "Day" not "Date," favoring cfengine over CL naming)
  * Monday, Tuesday, etc.  - days of the week are themselves
